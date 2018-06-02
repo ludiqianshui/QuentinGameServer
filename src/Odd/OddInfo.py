@@ -4,11 +4,12 @@ Created on 3 Aug 2017
 @author: qsong
 '''
 import unittest
-import urllib2
+import urllib.request
+import urllib3
 from bs4 import BeautifulSoup
 import datetime
 import json
-from bs4 import UnicodeDammit
+# from bs4 import UnicodeDammit
 
 
 class OddInfo(object):
@@ -21,7 +22,7 @@ class OddInfo(object):
 
     def get_game_odd_by_time(self, odd_type, game_id, company_id):
         game_odd_url = self.game_odd_base_url.format(odd_type, game_id, company_id)
-        page_content = urllib2.urlopen(game_odd_url)
+        page_content = urllib.request.urlopen(game_odd_url)
         if page_content.code == 200:
             soup = BeautifulSoup(page_content, "lxml")
             time_odd_table_body = soup.find_all("span", id="odds")
@@ -41,10 +42,12 @@ class OddInfo(object):
                 print ("odd_item_down_rate  {}".format(odd_item_down_rate.encode('utf-8')))
 
     def get_game_odd_by_oddchange(self, odd_type, game_id, company_id):
-        game_odd_url = self.game_odd_base_url.format(odd_type, game_id, company_id)
-        page_content = urllib2.urlopen(game_odd_url)
-        if page_content.code == 200:
-            soup = BeautifulSoup(page_content, "lxml")
+
+        http = urllib3.PoolManager()
+        url = 'http://vip.win007.com/changeDetail/handicap.aspx?id=1509857&companyID=3'
+        response = http.request('GET', url)
+        if response.status == 200:
+            soup = BeautifulSoup(response.data)
             change_odd_table_body = soup.find_all("span", id="odds2")
             if len(change_odd_table_body) == 0:
                 return
@@ -107,7 +110,7 @@ class Test(unittest.TestCase):
         return
 
     def test_get_today_game_odd(self):
-        self.test_obj.get_daily_game_odd()
+        self.test_obj.get_game_odd("handicap", 1509851, "3")
         return
 
     #     def test_download_season_league_all(self):
