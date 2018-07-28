@@ -40,7 +40,7 @@ class GameInfo(object):
         os.remove("../../data/game/day_table_info.html")
         return
 
-    def _get_game_id_from_day_table(self, day_table_file = "../../data/game/day_table_info.html"):
+    def _get_game_id_from_day_table(self, day_table_file="../../data/game/day_table_info.html"):
         today_game_list = []
         soup = BeautifulSoup(open(day_table_file),'html.parser')
         onclick = soup.findAll('td', onclick=True)

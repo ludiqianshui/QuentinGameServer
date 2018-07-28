@@ -25,9 +25,20 @@ class OddInfo(object):
         day_file = open("../../data/odd/odd_info.html", 'w+')
         day_file.write(elem.encode('ascii', 'ignore').decode('ascii'))
         day_file.close()
+        self._get_game_odd_from_table()
+
         os.remove("../../data/odd/odd_info.html")
         return
 
+    def _get_game_odd_from_table(self, day_table_file="../../data/odd/odd_info.html"):
+        soup = BeautifulSoup(open(day_table_file), 'html.parser')
+        time_odd_table_body = soup.findAll(id='div_l')
+        if len(time_odd_table_body) == 0:
+            return
+        time_odd_item_list = time_odd_table_body[0].find_all("tr")
+        print("game has {}".format(len(time_odd_item_list)))
+        return
+'''
     def get_yesterday_game_odd(self):
         time_yesterday = datetime.datetime.today() - datetime.timedelta(1)
         time_yesterday = time_yesterday.strftime('%Y-%m-%d')
@@ -51,7 +62,7 @@ class OddInfo(object):
             self.get_game_odd("handicap", game_id, "3")  # handicap is asian handicap / 3 is the company of SB
 
         return
-
+'''
 
 class Test(unittest.TestCase):
     def setUp(self):
