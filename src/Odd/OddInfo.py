@@ -4,76 +4,28 @@ Created on 3 Aug 2017
 @author: qsong
 '''
 import unittest
-import urllib.request
+import requests
 import urllib3
 from bs4 import BeautifulSoup
 import datetime
 import json
-# from bs4 import UnicodeDammit
+from selenium import webdriver
+import os
 
 
 class OddInfo(object):
-    game_odd_base_url = "http://vip.win007.com/changeDetail/{}.aspx?id={}&companyID={}"
+    game_odd_base_url = "http://data.nowgoal.com/3in1odds/{}_{}.html"
 
     def get_game_odd(self, odd_type, game_id, company_id):
-        #        self.get_game_odd_by_time(odd_type, game_id,company_id)    by time is removed from the scope
-        self.get_game_odd_by_oddchange(odd_type, game_id, company_id)
-        return
-
-    def get_game_odd_by_time(self, odd_type, game_id, company_id):
-        game_odd_url = self.game_odd_base_url.format(odd_type, game_id, company_id)
-        page_content = urllib.request.urlopen(game_odd_url)
-        if page_content.code == 200:
-            soup = BeautifulSoup(page_content, "lxml")
-            time_odd_table_body = soup.find_all("span", id="odds")
-            if len(time_odd_table_body) == 0:
-                return
-            time_odd_item_list = time_odd_table_body[0].find_all("tr", bgcolor="#ffffff")
-            print ("gameid {} has {}".format(game_id, len(time_odd_item_list)))
-            for odd_item in time_odd_item_list:
-                odd_item_time = odd_item.find_all("td")[0].next  # time
-                odd_item_type = odd_item.find_all("td")[1].next  # odd type
-                odd_item_up_rate = odd_item.find_all("td")[2].text  # shangpan shuiwei
-                odd_item_down_rate = odd_item.attrs['title'].split(':')[1]  # xiapan shuiwei
-
-                print ("odd_item_time  {}   ".format(odd_item_time))
-                print ("odd_item_type  {}   ".format(odd_item_type.string.encode('utf-8')))
-                print ("odd_item_up_rate  {}".format(odd_item_up_rate.encode('utf-8')))
-                print ("odd_item_down_rate  {}".format(odd_item_down_rate.encode('utf-8')))
-
-    def get_game_odd_by_oddchange(self, odd_type, game_id, company_id):
-
-        http = urllib3.PoolManager()
-        url = 'http://vip.win007.com/changeDetail/handicap.aspx?id=1509857&companyID=3'
-        response = http.request('GET', url)
-        if response.status == 200:
-            soup = BeautifulSoup(response.data)
-            change_odd_table_body = soup.find_all("span", id="odds2")
-            if len(change_odd_table_body) == 0:
-                return
-            change_odd_item_list = change_odd_table_body[0].find_all("tr")
-            print ("gameid {} has {}".format(game_id, len(change_odd_item_list)))
-            if len(change_odd_item_list) < 0:
-                return
-            for odd_item in change_odd_item_list:
-                if len(odd_item.find_all("td")) < 7:
-                    odd_item_game_time = odd_item.find_all("td")[0].text  # game time
-                    odd_item_current_score = odd_item.find_all("td")[1].text  # score
-                    odd_item_up_rate = odd_item.find_all("td")[2].text  # shangpan shuiwei
-                    odd_item_type = odd_item.find_all("td")[2].text  # odd type
-                    odd_item_down_rate = odd_item.find_all("td")[2].text  # xiapanshuiwei
-                    odd_item_time = odd_item.find_all("td")[3].text  # time
-                    odd_item_state = odd_item.find_all("td")[4].text
-                    print (odd_item_game_time, odd_item_current_score, odd_item_up_rate, odd_item_type, odd_item_down_rate, odd_item_time, odd_item_state)
-                else:
-                    odd_item_game_time = odd_item.find_all("td")[0].text  # game time
-                    odd_item_current_score = odd_item.find_all("td")[1].text  # score
-                    odd_item_up_rate = odd_item.find_all("td")[2].text  # shangpan shuiwei
-                    odd_item_type = odd_item.find_all("td")[3].text  # odd type
-                    odd_item_down_rate = odd_item.find_all("td")[4].text  # xiapanshuiwei
-                    odd_item_time = odd_item.find_all("td")[5].text  # time
-                    odd_item_state = odd_item.find_all("td")[6].text
-                    print (odd_item_game_time, odd_item_current_score, odd_item_up_rate, odd_item_type, odd_item_down_rate, odd_item_time, odd_item_state)
+        game_odd_url = self.game_odd_base_url.format(company_id, game_id)
+        print(game_odd_url)
+        driver = webdriver.Chrome("/usr/lib/chromium-browser/chromedriver")
+        driver.get(game_odd_url)
+        elem = driver.find_element_by_id('main').get_attribute('outerHTML')
+        day_file = open("../../data/odd/odd_info.html", 'w+')
+        day_file.write(elem.encode('ascii', 'ignore').decode('ascii'))
+        day_file.close()
+        os.remove("../../data/odd/odd_info.html")
         return
 
     def get_yesterday_game_odd(self):
@@ -110,7 +62,7 @@ class Test(unittest.TestCase):
         return
 
     def test_get_today_game_odd(self):
-        self.test_obj.get_game_odd("handicap", 1509851, "3")
+        self.test_obj.get_game_odd("handicap", 1553811, "3")
         return
 
     #     def test_download_season_league_all(self):

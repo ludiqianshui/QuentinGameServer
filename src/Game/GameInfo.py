@@ -9,6 +9,7 @@ from selenium import webdriver
 import re
 import datetime
 import json
+import os
 
 class GameInfo(object):
     '''
@@ -35,6 +36,8 @@ class GameInfo(object):
         day_file.close()
         today_game_list = self._get_game_id_from_day_table()
         self.write_daily_game_info(today_game_list)
+        driver.close()
+        os.remove("../../data/game/day_table_info.html")
         return
 
     def _get_game_id_from_day_table(self, day_table_file = "../../data/game/day_table_info.html"):
@@ -57,6 +60,7 @@ class GameInfo(object):
 
         with open("../../data/game/daily_game_info.json", 'w') as data_file:
             data_file.write(json.dumps(data))
+        return
 
 '''
     def get_game_info_by_id (self, game_id):
@@ -76,10 +80,6 @@ class GameInfo(object):
                 game_file.write(script_in_body.text.encode('ascii', 'ignore').decode('ascii'))
                 game_file.close()
         return
-
-
-        
-
 '''
 
 
@@ -94,7 +94,7 @@ class Test(unittest.TestCase):
 
     def test_get_game_info(self):
         pass
-#         self.test_obj.get_game_info_by_id(1365286)
+#        self.test_obj.get_game_info_by_id(1365286)
         # self.test_obj.get_goldenbet()
         return
 
@@ -104,5 +104,4 @@ class Test(unittest.TestCase):
         return
 
 
-        
-        
+
