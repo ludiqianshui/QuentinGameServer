@@ -37,7 +37,15 @@ class OddInfo(object):
             return
         odd_item_list = time_odd_table_body[0].find_all("tr", class_=re.compile(r' gt([1-2])$'))
         print("game has {}".format(len(odd_item_list)))
-
+        for odd_item in odd_item_list:
+            odd_item_game_time = odd_item.find_all("td")[0].text  #time
+            odd_item_current_score = odd_item.find_all("td")[1].text  # score
+            odd_item_home_rate = odd_item.find_all("td")[2].text  # home shuiwei
+            odd_item_odd_type = odd_item.find_all("td")[3].text  # odd type
+            odd_item_away_rate = odd_item.find_all("td")[4].text  # away shuiwei
+            odd_item_time = odd_item.find_all("td")[5].text  # updated time
+            odd_item_status = odd_item.find_all("td")[6].text  # updated status
+            print("odd_item_game_time {} / odd_item_current_score {} / odd_item_home_rate {} / odd_item_odd_type {} / odd_item_away_rate {} /odd_item_away_time {} / odd_item_status {}".format(odd_item_game_time, odd_item_current_score, odd_item_home_rate, odd_item_odd_type, odd_item_away_rate, odd_item_time, odd_item_status))
         return
 '''
     def get_yesterday_game_odd(self):
