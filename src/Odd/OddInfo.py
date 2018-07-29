@@ -11,7 +11,7 @@ import datetime
 import json
 from selenium import webdriver
 import os
-
+import re
 
 class OddInfo(object):
     game_odd_base_url = "http://data.nowgoal.com/3in1odds/{}_{}.html"
@@ -26,7 +26,7 @@ class OddInfo(object):
         day_file.write(elem.encode('ascii', 'ignore').decode('ascii'))
         day_file.close()
         self._get_game_odd_from_table()
-
+        driver.close()
         os.remove("../../data/odd/odd_info.html")
         return
 
@@ -35,8 +35,9 @@ class OddInfo(object):
         time_odd_table_body = soup.findAll(id='div_l')
         if len(time_odd_table_body) == 0:
             return
-        time_odd_item_list = time_odd_table_body[0].find_all("tr")
-        print("game has {}".format(len(time_odd_item_list)))
+        odd_item_list = time_odd_table_body[0].find_all("tr", class_=re.compile(r' gt([1-2])$'))
+        print("game has {}".format(len(odd_item_list)))
+
         return
 '''
     def get_yesterday_game_odd(self):
