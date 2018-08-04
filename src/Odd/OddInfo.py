@@ -22,16 +22,19 @@ class OddInfo(object):
         driver = webdriver.Chrome("/usr/lib/chromium-browser/chromedriver")
         driver.get(game_odd_url)
         elem = driver.find_element_by_id('main').get_attribute('outerHTML')
-        day_file = open("../../data/odd/odd_info.html", 'w+')
+        day_file = open("../../data/odd/odd_info.html", 'w')
         day_file.write(elem.encode('ascii', 'ignore').decode('ascii'))
-        day_file.close()
         odd_list = self._get_game_odd_from_table()
-        self.write_game_odd_info(odd_list)
+        odd_list.reverse()
+        print(odd_list)
+        self.write_game_odd_info(game_id, company_id,  odd_list)
         driver.close()
+        day_file.close()
         os.remove("../../data/odd/odd_info.html")
         return
 
     def _get_game_odd_from_table(self, day_table_file="../../data/odd/odd_info.html"):
+        game_odd_list = []
         soup = BeautifulSoup(open(day_table_file), 'html.parser')
         time_odd_table_body = soup.findAll(id='div_l')
         if len(time_odd_table_body) == 0:
@@ -46,23 +49,19 @@ class OddInfo(object):
             odd_item_away_rate = odd_item.find_all("td")[4].text  # away_value
             odd_item_time = odd_item.find_all("td")[5].text  # updated_time
             odd_item_status = odd_item.find_all("td")[6].text  # odded_status
-            print("odd_item_game_time {} / odd_item_current_score {} / odd_item_home_rate {} / odd_item_odd_type {} / odd_item_away_rate {} /odd_item_away_time {} / odd_item_status {}".format(odd_item_game_time, odd_item_current_score, odd_item_home_rate, odd_item_odd_type, odd_item_away_rate, odd_item_time, odd_item_status))
+            # print("odd_item_game_time {} / odd_item_current_score {} / odd_item_home_rate {} / odd_item_odd_type {} / odd_item_away_rate {} /odd_item_away_time {} / odd_item_status {}".format(odd_item_game_time, odd_item_current_score, odd_item_home_rate, odd_item_odd_type, odd_item_away_rate, odd_item_time, odd_item_status))
+            odd_dict = {"odd_item_game_time": odd_item_game_time, "odd_item_current_score": odd_item_current_score,
+                        "odd_item_home_rate": odd_item_home_rate, "odd_item_odd_type": odd_item_odd_type,
+                        "odd_item_away_rate": odd_item_away_rate, "odd_item_time": odd_item_time, "odd_item_status": odd_item_status}
+            # print(odd_dict)
+            game_odd_list.append(odd_dict)
+        return game_odd_list
 
+    def write_game_odd_info(self, game_id, company_id,  odd_list):
+        with open("../../data/odd/game{}_company{}_odd.json".format(game_id, company_id), 'w') as odd_file:
+
+            odd_file.write(json.dumps(odd_list))
         return
-
-    def write_game_odd_info(self, game_list):
-        time_now = datetime.datetime.now()
-        time_now = time_now.strftime('%Y-%m-%d')
-
-        with open("../../data/game/daily_game_info.json", 'r') as data_file:
-            data = json.load(data_file)
-        print (data)
-        data.update({time_now:game_list})
-
-        with open("../../data/game/daily_game_info.json", 'w') as data_file:
-            data_file.write(json.dumps(data))
-        return
-
 
 '''
     def get_daily_game_odd(self):
