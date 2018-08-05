@@ -4,14 +4,14 @@ Created on 3 Aug 2017
 @author: qsong
 '''
 import unittest
-import requests
-import urllib3
+
 from bs4 import BeautifulSoup
 import datetime
 import json
 from selenium import webdriver
 import os
 import re
+import time
 
 class OddInfo(object):
     game_odd_base_url = "http://data.nowgoal.com/3in1odds/{}_{}.html"
@@ -21,13 +21,19 @@ class OddInfo(object):
         print(game_odd_url)
         driver = webdriver.Chrome("/usr/lib/chromium-browser/chromedriver")
         driver.get(game_odd_url)
+        time.sleep(10)
         elem = driver.find_element_by_id('main').get_attribute('outerHTML')
+        if elem == None:
+            return
         day_file = open("../../data/odd/odd_info.html", 'w')
         day_file.write(elem.encode('ascii', 'ignore').decode('ascii'))
         odd_list = self._get_game_odd_from_table()
+        if odd_list == None:
+            return
+
         odd_list.reverse()
         print(odd_list)
-        self.write_game_odd_info(game_id, company_id,  odd_list)
+        self._write_game_odd_info(game_id, company_id,  odd_list)
         driver.close()
         day_file.close()
         os.remove("../../data/odd/odd_info.html")
@@ -57,10 +63,28 @@ class OddInfo(object):
             game_odd_list.append(odd_dict)
         return game_odd_list
 
-    def write_game_odd_info(self, game_id, company_id,  odd_list):
+    def _write_game_odd_info(self, game_id, company_id,  odd_list):
         with open("../../data/odd/game{}_company{}_odd.json".format(game_id, company_id), 'w') as odd_file:
 
             odd_file.write(json.dumps(odd_list))
+        return
+
+    def get_yesterday_game_odd(self):
+        time_yesterday = datetime.datetime.today() - datetime.timedelta(1)
+        time_yesterday = time_yesterday.strftime('%Y-%m-%d')
+        self._get_game_odd_per_date(time_yesterday)
+        return
+        
+    def _get_game_odd_per_date(self, date_str):
+        with open("../../data/game/daily_game_info.json", 'r') as data_file:
+            data = json.load(data_file)
+        game_id_list = data[date_str]
+        print  (date_str, len(game_id_list))  # date and games number
+        if len(game_id_list) < 1:  # in case there is no game by day, or daily is list not in the json
+            return
+        for game_id in game_id_list:
+            self.get_game_odd("handicap", game_id, "3")  # handicap is asian handicap / 3 is the company of SB
+            time.sleep(60)
         return
 
 '''
@@ -69,24 +93,8 @@ class OddInfo(object):
         time_now = time_now.strftime('%Y-%m-%d')
         self._get_game_odd_per_date(time_now)
         return
-        
-    def get_yesterday_game_odd(self):
-        time_yesterday = datetime.datetime.today() - datetime.timedelta(1)
-        time_yesterday = time_yesterday.strftime('%Y-%m-%d')
-        self._get_game_odd_per_date(time_yesterday)
-        return
-        
-    def _get_game_odd_per_date(self, date_str):
-        with open("../../../data/game/daily_game_info.json", 'r') as data_file:
-            data = json.load(data_file)
-        game_id_list = data[date_str]
-        print  (date_str, len(game_id_list))  # date and games number
-        if len(game_id_list) < 1:  # in case there is no game by day, or daily is list not in the json
-            return
-        for game_id in game_id_list:
-            self.get_game_odd("handicap", game_id, "3")  # handicap is asian handicap / 3 is the company of SB
-        return
 '''
+
 
 class Test(unittest.TestCase):
     def setUp(self):
@@ -97,14 +105,12 @@ class Test(unittest.TestCase):
         return
 
     def test_get_today_game_odd(self):
-        self.test_obj.get_game_odd("handicap", 1553811, "3")
+        # self.test_obj.get_game_odd("handicap", 1554690, "3")
         return
 
-    #     def test_download_season_league_all(self):
-    #         league_id_list = self.test_obj.league_id_list
-    #         season_list = self.test_obj.season_list
-    #         self.test_obj.download_season_league_all(league_id_list, season_list)
-    #         return True
+    def test_get_yesterday_game_odd(self):
+        self.test_obj.get_yesterday_game_odd()
+        return
 
     def test_get_game_odd(self):
         # self.test_obj.get_game_odd("handicap", "1472351", "3")
