@@ -30,7 +30,6 @@ class OddInfo(object):
         odd_list = self._get_game_odd_from_table()
         if odd_list == None:
             return
-
         odd_list.reverse()
         print(odd_list)
         self._write_game_odd_info(game_id, company_id,  odd_list)
