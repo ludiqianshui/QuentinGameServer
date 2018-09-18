@@ -16,13 +16,13 @@ class GameInfo(object):
     This module provides League related function
     '''
     game_base_url = "http://zq.win007.com/analysis/{}.htm"
-        
+
     def __init__(self):
         '''
         Constructor
         '''
         return
-    
+
     def __del__(self):
         return
 
