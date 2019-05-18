@@ -31,7 +31,12 @@ class GameInfo(object):
         project_dir = file_dir.replace("/src/Game",'')
         chromedriver_dir = os.path.join(project_dir, "bin/chromedriver")
         print (chromedriver_dir)
-        driver = webdriver.Chrome(chromedriver_dir)
+
+        firefox_binary_dir = os.path.join(project_dir, "bin/geckodriver")
+        print (firefox_binary_dir)
+#        driver = webdriver.Chrome(chromedriver_dir)
+        driver = webdriver.Firefox(executable_path=firefox_binary_dir)
+
         driver.get("http://www.nowgoal.com/")
         elem = driver.find_element_by_id('mintable').get_attribute('outerHTML')
         day_file = open("../../data/game/day_table_info.html", 'w+')
