@@ -77,6 +77,9 @@
 	},
 	"team_info": {
 		"js_file": "http://zq.win007.com/jsData/teamInfo/team8.js",
-		"js_team_detail": "http://zq.win007.com/jsData/teamInfo/teamDetail/tdl88.js"
+		"js_team_detail": "http://zq.win007.com/jsData/teamInfo/teamDetail/tdl88.js",
+		"team_detail_nowgoal": "http://info.nowgoal.com/en/team/Summary/423.html",
+		"team_detail_nowgoal_js": "http://info.nowgoal.com/jsData/teamInfo/teamDetail/tdl423_en.js"
+
 	}
 }
