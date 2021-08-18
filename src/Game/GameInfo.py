@@ -30,8 +30,8 @@ class GameInfo(object):
         file_dir = os.path.abspath(os.path.dirname(__file__))
         project_dir = file_dir.replace("/src/Game",'')
 
-#        driver = webdriver.Chrome(chromedriver_dir)
-        driver = webdriver.Firefox()
+        driver = webdriver.Chrome()
+        #driver = webdriver.Firefox()
 
         driver.get("http://www.nowgoal.com/")
         elem = driver.find_element_by_id('mintable').get_attribute('outerHTML')
@@ -49,8 +49,10 @@ class GameInfo(object):
         soup = BeautifulSoup(open(day_table_file),'html.parser')
         onclick = soup.findAll('td', onclick=True)
         for elm in onclick:
-            match = re.search(r"showgoallist\(([0-9]+)\)", str(elm))
-            today_game_list.append(match.group(1))
+            match = re.search(r"OpenDetail\(([0-9]+)\)", str(elm))
+            print(match.group())
+            game_id = match.group(1)
+            today_game_list.append(game_id)
         return today_game_list
 
     def write_daily_game_info(self, game_list):
